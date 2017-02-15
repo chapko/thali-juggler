@@ -1,0 +1,15 @@
+{
+  "name": "thali-remote-runner-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": "./bin/thali-serve",
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "archiver": "^1.3.0"
+  }
+}

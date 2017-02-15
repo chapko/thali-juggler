@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+
+const path = require('path');
+const server = require('..');
+
+let port = process.env.PORT || 3000;
+let directory = '.';
+
+let params = process.argv.slice(2);
+
+while (params.length) {
+  let key = params.shift();
+  let value;
+  switch(key) {
+    case '-p':
+    case '--port':
+      let strvalue = params.shift();
+      value = Number(strvalue);
+      if (isNaN(value) || value < 0 || value > 65535) {
+        exit('Invalid port: ' + strvalue);
+      }
+      port = value;
+      break;
+    default:
+      if (params.length === 0) {
+        directory = key;
+      } else {
+        exit('Unrecognized option: ' + key);
+      }
+  }
+}
+
+if (!path.isAbsolute(directory)) {
+  directory = path.join(process.cwd(), directory);
+}
+
+server.run(directory, port);
+
+
+function exit(error) {
+  if (error) {
+    console.error(error);
+  }
+  process.exit(Number(Boolean(error))); //hehe
+}

@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -eu
+
+SCRIPT_DIR=$(dirname "$(realpath "$0")")
+
+DEFAULT_THALI_ROOT=$(realpath "$SCRIPT_DIR/../Thali_CordovaPlugin")
+THALI_ROOT=$(realpath "${1:-$DEFAULT_THALI_ROOT}")
+
+echo 'Setting up server...'
+(
+  cd "${SCRIPT_DIR}/server"
+  npm install
+)
+echo 'Done'
+
+
+
+echo 'Setting up cordova app...'
+(
+  mkdir -p "${SCRIPT_DIR}/thaliDontCheckIn/localdev"
+  cd "${SCRIPT_DIR}/www/jxcore"
+  echo "Installing Thali..."
+  npm install
+  NVM_NODEJS_ORG_MIRROR=https://jxcore.azureedge.net JX_NPM_JXB=jxb311 \
+    jx npm install "${THALI_ROOT}/thali" --no-optional
+  find . -name '*.gz' -delete
+)
+echo 'Done'
+
+
+echo <<\INFO
+
+To build app for android run
+
+    cordova platform add andoird
+    cordova build android --device --release
+
+For iOS build replace `andoird' with `ios'
+
+INFO
