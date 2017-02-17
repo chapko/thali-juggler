@@ -1,0 +1,10 @@
+{
+  "name": "thali-remote-runner-installer",
+  "version": "1.0.0",
+  "description": "",
+  "license": "MIT",
+  "dependencies": {
+    "jxc": "^1.0.15"
+  },
+  "private": true
+}

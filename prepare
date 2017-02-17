@@ -7,6 +7,10 @@ SCRIPT_DIR=$(dirname "$(realpath "$0")")
 DEFAULT_THALI_ROOT=$(realpath "$SCRIPT_DIR/../Thali_CordovaPlugin")
 THALI_ROOT=$(realpath "${1:-$DEFAULT_THALI_ROOT}")
 
+BTLIB_VERSION="0.3.9"
+JXCORE_CORDOVA_VERSION="0.1.10"
+JXCORE_CORDOVA_URL="http://jxcore.azureedge.net/jxcore-cordova/0.1.10/release/io.jxcore.node.jx"
+
 echo 'Setting up server...'
 (
   cd "${SCRIPT_DIR}/server"
@@ -15,21 +19,40 @@ echo 'Setting up server...'
 echo 'Done'
 
 
-
 echo 'Setting up cordova app...'
 (
-  mkdir -p "${SCRIPT_DIR}/thaliDontCheckIn/localdev"
-  cd "${SCRIPT_DIR}/www/jxcore"
-  echo "Installing Thali..."
+  cd "${SCRIPT_DIR}/install"
   npm install
-  NVM_NODEJS_ORG_MIRROR=https://jxcore.azureedge.net JX_NPM_JXB=jxb311 \
-    jx npm install "${THALI_ROOT}/thali" --no-optional
-  find . -name '*.gz' -delete
 )
+
+(
+  cd "${SCRIPT_DIR}/www/jxcore"
+  npm install --no-optional
+)
+
+(
+  cd "${SCRIPT_DIR}"
+  echo "Installing jxcore-cordova@${JXCORE_CORDOVA_VERSION}"
+  mkdir -p thaliDontCheckIn/localdev
+  install/node_modules/.bin/jxc install \
+    "$JXCORE_CORDOVA_VERSION" \
+    --use-url "$JXCORE_CORDOVA_URL"
+
+  echo "Adding thali cordova plugin"
+  cordova plugin add "${THALI_ROOT}"
+
+  echo "Updating thali cordova plugin's gradle.properties file"
+  cat <<GRADLEPROPERTIES > plugins/org.thaliproject.p2p/src/android/gradle.properties
+btconnectorlib2Version = ${BTLIB_VERSION}
+cdvMinSdkVersion = 21
+cdvCompileSdkVersion = android-23
+GRADLEPROPERTIES
+)
+
+
 echo 'Done'
 
-
-echo <<\INFO
+cat <<\INFO
 
 To build app for android run
 
